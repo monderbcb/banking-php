@@ -94,5 +94,6 @@
                         $('#dtBasicExample').DataTable();
                         $('.dataTables_length').addClass('bs-select');
                         });
-                        </script></body>
+                        </script>
+                        </body>
 </html>

@@ -15,17 +15,44 @@
     include 'config.php';
     if(isset($_POST['submit'])){
     $name=$_POST['name'];
+    $phone=$_POST['phone'];
+    $address=$_POST['address'];
+    $nid=$_POST['nid']; //
+    $notes=$_POST['notes'];
+    $filename = $_FILES["uploadfile"]["name"];
+    $tempname = $_FILES["uploadfile"]["tmp_name"];
+    $folder = "./image/" . $filename;
     $email=$_POST['email'];
     $gender=$_POST['gender'];
     $balance=$_POST['balance'];
-    $sql="insert into users(name,email,gender,balance) values('{$name}','{$email}','{$gender}','{$balance}')";
+    $ALL_DONE=false;
+    // check if user exsits using the NID 
+    $sql ="SELECT * FROM users WHERE nid like '%$nid%'";
+
+   $query =mysqli_query($conn, $sql);
+
+    if(mysqli_num_rows($query))
+    {
+      echo "<script> alert('User Already Exsists! Please check The National identification Number.');
+                     </script>";
+    }
+    else{
+ 
+    $sql="insert into users(name,phone,address,notes,nid,image,email,gender,balance) values
+    ('{$name}', '{$phone}' ,'{$address}' ,'{$notes}' ,'{$nid}' ,'{$filename}' ,'{$email}','{$gender}','{$balance}')";
     $result=mysqli_query($conn,$sql);
-    if($result){
+    if (move_uploaded_file($tempname, $folder)) {
+      $ALL_DONE=true;
+  } else {
+      echo "<h3>  Failed to upload image!</h3>";
+  }
+    if($ALL_DONE){
                echo "<script> alert('User has been created!');
-                               window.location='transfermoney.php';
+                               window.location='accountIndex.php';
                      </script>";
                     
     }
+  }
   }
 ?>
 
@@ -46,14 +73,28 @@
           <div class="screen-header-ellipsis"></div>
         </div>
       </div>
+
       <div class="screen-body">
         <div class="screen-body-item left">
-          <img class="img-fluid" src="img/user3.jpg" style="border: none; border-radius: 10%;">
+      
+        <form class="app-form" method="post" enctype="multipart/form-data">
+        <img class="img-fluid" id="blah" src="img/user3.jpg" style="border: none; border-radius: 10%;" alt="" />
+          <input accept="image/*" type='file' id="imgInp" name="uploadfile" value="" 
+          style="border: none; border-radius: 10%; width: 50%;" />
         </div>
         <div class="screen-body-item">
-          <form class="app-form" method="post">
             <div class="app-form-group">
               <input class="app-form-control" placeholder="FULLNAME" type="text" name="name" required>
+            </div>
+            <div class="app-form-group">
+              <input class="app-form-control" placeholder="PHONE" type="phone" name="phone" required>
+            </div>
+            <div class="app-form-group">
+              <input class="app-form-control" placeholder="National Identification Number"
+               type="number" name="nid" required>
+            </div>
+            <div class="app-form-group">
+              <textarea class="app-form-control" placeholder="Address" name="address" required></textarea>
             </div>
             <div class="app-form-group">
               <input class="app-form-control" placeholder="EMAIL" type="email" name="email" required>
@@ -65,24 +106,35 @@
                 <option value="Female">Female</option>
               </select>
             </div>
+            
             <div class="app-form-group">
               <input class="app-form-control" placeholder="INITIAL BALANCE" type="number" name="balance" required>
+            </div>
+            <div class="app-form-group">
+              <textarea class="app-form-control" placeholder="Notes" rows="5" name="notes"></textarea>
             </div>
             <br>
             <div class="app-form-group button">
               <input class="app-form-button" style="color:#4d865a;" type="submit" value="CREATE USER" name="submit"></input>
               <input class="app-form-button" style="color:#dc3545;" type="reset" value="RESET" name="reset"></input>
             </div>
-          </form>
+          
         </div>
+        </form>
       </div>
     </div>
   </div>
 </div>
-<footer class="text-center mt-5 py-2">
-            <p>&copy 2021 Made by <b>AYUSH PRAJAPATI</b></p>
-</footer>
+<?php include 'footer.php'; ?>
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous"></script>
+<script> 
+imgInp.onchange = evt => {
+  const [file] = imgInp.files
+  if (file) {
+    blah.src = URL.createObjectURL(file)
+  }
+}
+</script>
 </body>
 </html>

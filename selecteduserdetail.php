@@ -16,7 +16,7 @@ if(isset($_POST['submit']))
     $amount = $_POST['amount'];
     $notes = $_POST['notes'];
     $opType = $_GET['type'];
-
+    $checkNumber = $_POST['checkNumber'];
 
     $sql = "SELECT * from users where id=$from and status <> 9";
     $query = mysqli_query($conn,$sql);
@@ -68,7 +68,7 @@ if(isset($_POST['submit']))
                 $newbalance = $sql1['balance'] - $amount;
                 $checksum = $sql1['checksum'] + 1;
                 if  ($opType == 2) 
-                    $notes = $notes . " ---//// Operation: " . $actionType . " Check Number: " . $_POST['checkNumber'];
+                    
                 $sql = "UPDATE users set balance=$newbalance , checksum=$checksum where id=$from";
                 mysqli_query($conn,$sql);
         }
@@ -79,15 +79,15 @@ if(isset($_POST['submit']))
                 if  ($opType == 1) {
                     $checksum = $sql2['checksum'] + 1;
                     $sql = "UPDATE users set balance=$newbalance , checksum=$checksum where id=$to";
-                    $notes = $notes . " ---//// Operation: " . $actionType . " Check Number: " . $_POST['checkNumber'];
+                    
 
                 }
                 mysqli_query($conn,$sql);
         }
                 $sender = $sql1['id'];
                 $receiver = $sql2['id'];
-                $sql = "INSERT INTO transaction(`senderId`, `receiverId`, `balance` , `actionType` , `notes`) 
-                VALUES ('$sender','$receiver','$amount' , $opType , '$notes')";
+                $sql = "INSERT INTO transaction(`senderId`, `receiverId`, `balance` , `actionType` , `notes` , `Check Number`) 
+                VALUES ('$sender','$receiver','$amount' , $opType , '$notes' ,  '$checkNumber')";
                 $query=mysqli_query($conn,$sql);
                 echo $conn->error; //
                 if($query){
