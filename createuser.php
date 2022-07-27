@@ -14,6 +14,7 @@
 <?php
     include 'config.php';
     if(isset($_POST['submit'])){
+    $overDraw = $_POST['overDraw'];
     $name=$_POST['name'];
     $phone=$_POST['phone'];
     $address=$_POST['address'];
@@ -37,9 +38,9 @@
                      </script>";
     }
     else{
- 
-    $sql="insert into users(name,phone,address,notes,nid,image,email,gender,balance) values
-    ('{$name}', '{$phone}' ,'{$address}' ,'{$notes}' ,'{$nid}' ,'{$filename}' ,'{$email}','{$gender}','{$balance}')";
+
+    $sql="insert into users(name,phone,address,notes,nid,image,email,gender,balance,overDraw ) values
+    ('{$name}', '{$phone}' ,'{$address}' ,'{$notes}' ,'{$nid}' ,'{$filename}' ,'{$email}','{$gender}','{$balance}','{$overDraw}')";
     $result=mysqli_query($conn,$sql);
     if (move_uploaded_file($tempname, $folder)) {
       $ALL_DONE=true;
@@ -98,6 +99,9 @@
             </div>
             <div class="app-form-group">
               <input class="app-form-control" placeholder="EMAIL" type="email" name="email" required>
+            </div>
+            <div class="app-form-group">
+              <input class="app-form-control" placeholder="Over Draw" value="<?php echo $row['overDraw'] ?>" type="number" name="overDraw">
             </div>
             <div class="app-form-group">
               <select name="gender" class="app-form-control" type="text" required>

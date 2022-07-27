@@ -3,11 +3,12 @@ include 'config.php';
 
 if(isset($_POST['submit']))
 {
+    $ALLOW_ACTION = true;
     $actionType = $_GET['type'];
      switch ($actionType) {
-        case 1:echo 'Deposit';$actionType='Deposit';  break; 
-        case 2:echo 'Withdraw';$actionType='Withdraw'; break;
-        case 3:echo 'Transfer';$actionType='Transfer'; break;   
+        case 1:$actionType='Deposit';  break; 
+        case 2:$actionType='Withdraw'; break;
+        case 3:$actionType='Transfer'; break;   
         }
     $from = $_GET['id'];
     $to = $from;
@@ -34,43 +35,66 @@ if(isset($_POST['submit']))
         echo '<script type="text/javascript">';
         echo ' alert("Oops! Negative values cannot be '.$actionType.'")';  // showing an alert box.
         echo '</script>';
+        $ALLOW_ACTION = false;
+    
     }
 
 
   
     // constraint to check insufficient balance.
     else if(($opType == 3 || $opType == 2) && $amount > $sql1['balance']) 
-    { 
+    { // echo $sql1['overDraw']+ $sql1['balance'];
+        $allowed_amount = strval($sql1['overDraw']+ $sql1['balance']) . " LYD";
+        // check overDraw limit
         
-        echo '<script type="text/javascript">';
-        echo ' alert("Sorry, Insufficient Balance")';  // showing an alert box.
-        echo '</script>';
+            if  ($amount > ($sql1['overDraw']+ $sql1['balance']) ){
+            $ALLOW_ACTION = false;
+            echo '<script type="text/javascript">';
+            echo ' alert("Sorry, Insufficient Balance & and the amount is bigger than the alowed Over Draw!The remaining amount is: '.$allowed_amount.' ");';  
+            echo '</script>';
+        }elseif($sql1['overDraw'] <=0){
+            $ALLOW_ACTION = false;
+            echo '<script type="text/javascript">';
+            echo ' alert("Sorry, Insufficient Balance  ")';  // showing an alert box.
+            echo '</script>';
+            }
     }
     
 
 
     // constraint to check zero values
     else if($amount == 0){
-
+        $ALLOW_ACTION = false;
          echo "<script type='text/javascript'>";
          echo "alert('Oops! Zero value cannot be ".$actionType."')";
          echo "</script>";
      }
-
-
-    else {
+    if ($ALLOW_ACTION){
 
             //$actionType='Deposit'; 1 
             //$actionType='Withdraw'; 2
             //$actionType='Transfer'; 3
         if  ($opType == 3 || $opType == 2) {
                 // deducting amount from sender's account and incrementing checksum from sender's account
+                echo $sql1['balance'] - $amount;
                 $newbalance = $sql1['balance'] - $amount;
                 $checksum = $sql1['checksum'] + 1;
-                if  ($opType == 2) 
-                    
-                $sql = "UPDATE users set balance=$newbalance , checksum=$checksum where id=$from";
-                mysqli_query($conn,$sql);
+                if  ($opType == 2) {
+                   if ($amount > $sql1['balance'] && $sql1['overDraw'] > 0 && 
+                   $amount <= ($sql1['overDraw']+ $sql1['balance'])) {
+                     $newbalance = $sql1['balance'] - $amount;
+                   }
+                    $sql = "UPDATE users set `balance`=$newbalance , `checksum`=$checksum where `id`=$from";
+                    mysqli_query($conn,$sql);
+                    if (mysqli_error($conn)) {
+                        error_log(mysqli_error($conn), 3, $log_file);
+                        echo "<script type='text/javascript'>";
+                        echo "alert('Oops! something went wrong with database connection or query! check log file for more information');";
+                        echo "window.location='transfermoney.php';";
+                        echo "</script>";   # code...
+                    }
+                    // echo mysqli_error($conn);
+                }
         }
         if  ($opType == 3 || $opType == 1) {
                 // adding amount to reciever's account
@@ -79,17 +103,30 @@ if(isset($_POST['submit']))
                 if  ($opType == 1) {
                     $checksum = $sql2['checksum'] + 1;
                     $sql = "UPDATE users set balance=$newbalance , checksum=$checksum where id=$to";
-                    
 
                 }
                 mysqli_query($conn,$sql);
+                if (mysqli_error($conn)) {
+                    error_log(mysqli_error($conn), 3, $log_file);
+                    echo "<script type='text/javascript'>";
+                    echo "alert('Oops! something went wrong with database connection or query! check log file for more information');";
+                    echo "window.location='transfermoney.php';";
+                    echo "</script>";    # code...
+                    }
         }
                 $sender = $sql1['id'];
                 $receiver = $sql2['id'];
-                $sql = "INSERT INTO transaction(`senderId`, `receiverId`, `balance` , `actionType` , `notes` , `Check Number`) 
-                VALUES ('$sender','$receiver','$amount' , $opType , '$notes' ,  '$checkNumber')";
+                $sql = "INSERT INTO transaction(`senderId`, `receiverId`, `balance` , `actionType` , `notes` , `checkNumber`) 
+                VALUES ('$sender','$receiver','$amount' , $opType , '$notes' ,  $checkNumber)";
                 $query=mysqli_query($conn,$sql);
-                echo $conn->error; //
+                //echo $conn->error; //
+                if (mysqli_error($conn)) {
+                	error_log(mysqli_error($conn), 3, $log_file);
+                    echo "<script type='text/javascript'>";
+                    echo "alert('Oops! something went wrong with database connection or query! check log file for more information');";
+                    echo "window.location='transfermoney.php';";
+                    echo "</script>";   # code...
+                    }
                 if($query){
                      echo "<script> alert('Transaction Completed');
                                      window.location='transactionhistory.php';

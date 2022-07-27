@@ -15,6 +15,8 @@
 <?php
     include 'config.php';
     if(isset($_POST['submit'])){
+    $id=$_GET['id'];
+    $overDraw = $_POST['overDraw'];
     $name=$_POST['name'];
     $phone=$_POST['phone'];
     $address=$_POST['address'];
@@ -25,31 +27,44 @@
     $folder = "./image/" . $filename;
     $email=$_POST['email'];
     $gender=$_POST['gender'];
-    $balance=$_POST['balance'];
     $ALL_DONE=false;
     // check if user exsits using the NID 
     $sql ="SELECT * FROM users WHERE nid like '%$nid%'";
-
+    // check old data serching wit user id insted of nid to difrentiate betwwen the same user id and the new nid
+    $oldSql ="SELECT * FROM users WHERE id= $id ; ";
+    $oldQuery =mysqli_query($conn, $oldSql);
+    $oldRow = mysqli_fetch_array($oldQuery);
    $query =mysqli_query($conn, $sql);
 
-    if(mysqli_num_rows($query))
+    if(mysqli_num_rows($query) && $oldRow['nid'] != $nid)
     {
       echo "<script> alert('User Already Exsists! Please check The National identification Number.');
-                     </script>";
+              window.location='userDetails.php?id=$id';         
+            </script>";
     }
     else{
- 
-    $sql="insert into users(name,phone,address,notes,nid,image,email,gender,balance) values
-    ('{$name}', '{$phone}' ,'{$address}' ,'{$notes}' ,'{$nid}' ,'{$filename}' ,'{$email}','{$gender}','{$balance}')";
-    $result=mysqli_query($conn,$sql);
-    if (move_uploaded_file($tempname, $folder)) {
-      $ALL_DONE=true;
-  } else {
-      echo "<h3>  Failed to upload image!</h3>";
-  }
-    if($ALL_DONE){
-               echo "<script> alert('User has been created!');
-                               window.location='accountIndex.php';
+     
+      $sql="UPDATE `users` SET `name`='{$name}',`email`='{$email}'
+      ,`gender`='{$gender}',`nid`='{$nid}',`phone`='{$phone}'
+      ,`address`='{$address}',`notes`='{$notes}',`image`='{$filename}' , `overDraw` = {$overDraw}
+       WHERE `id`={$id}";
+      $result=mysqli_query($conn,$sql);
+      // sql error
+      if(mysqli_error($conn))
+      echo "<script> alert('error occurred while executing query: ".mysqli_error($conn)."');
+        </script>" ;
+      if(!$oldRow['image'] == $filename) {
+          if (move_uploaded_file($tempname, $folder)) {
+            $ALL_DONE=true;
+        } else {
+            echo "<h3>  Failed to upload image!</h3>";
+        }
+      }else { 
+        $ALL_DONE=true;
+      }
+   
+      if($ALL_DONE){
+               echo "<script> alert('User has been Updated!');
                      </script>";
                     
     }
@@ -90,25 +105,28 @@
         </div>
         <div class="screen-body-item">
             <div class="app-form-group">
-              <input class="app-form-control" value="<?php echo $row['name'] ?>" type="text" name="name" required>
+              <input class="app-form-control" placeholder="Name" value="<?php echo $row['name'] ?>" type="text" name="name" required>
             </div>
             <div class="app-form-group">
-              <input class="app-form-control" value="<?php echo $row['phone'] ?>" type="phone" name="phone" required>
+              <input class="app-form-control" placeholder="Phone" value="<?php echo $row['phone'] ?>" type="phone" name="phone" required>
             </div>
             <div class="app-form-group">
-              <input class="app-form-control" value="<?php echo $row['nid'] ?>"
+              <input class="app-form-control" value="<?php echo $row['nid'] ?>" placeholder="NID"
                type="number" name="nid" required>
             </div>
             <div class="app-form-group">
-              <textarea class="app-form-control"  name="address" required>
+              <textarea class="app-form-control" placeholder="Address"  name="address" required>
               <?php echo $row['address'] ?>
               </textarea>
             </div>
             <div class="app-form-group">
-              <input class="app-form-control" value="<?php echo $row['email'] ?>" type="email" name="email" required>
+              <input class="app-form-control" placeholder="Email" value="<?php echo $row['email'] ?>" type="email" name="email" required>
             </div>
             <div class="app-form-group">
-              <select name="gender" class="app-form-control" type="text" required>
+              <input class="app-form-control" placeholder="Over Draw" value="<?php echo $row['overDraw'] ?>" type="number" name="overDraw">
+            </div>
+            <div class="app-form-group">
+              <select name="gender" placeholder="Gender" class="app-form-control" type="text" required>
               
                 <option value="Male">Male</option>
                 <option value="Female">Female</option>
@@ -116,7 +134,7 @@
             </div>
             
             <div class="app-form-group">
-              <textarea class="app-form-control" placeholder="Notes" rows="5" name="notes">
+              <textarea class="app-form-control" placeholder="Notes" placeholder="Notes" rows="5" name="notes">
               <?php echo $row['notes'] ?>
               </textarea>
             </div>
