@@ -16,8 +16,8 @@
                   </button>
                   <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                     <a class="dropdown-item" href="createuser.php">Create Account</a>
-                    <a class="dropdown-item" href="removeuser.php">Remove Account</a>
-                    <a class="dropdown-item" href="#">Edit Account</a>
+                    <a class="dropdown-item" href="accountIndex.php">Remove Account</a>
+                    <a class="dropdown-item" href="accountIndex.php">Edit Account</a>
                   </div>
                 </div>             
               </li>

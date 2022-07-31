@@ -32,7 +32,7 @@
 ?>
 
 <div class="container">
-        <h2 class="text-center pt-4" style="color : #6c757d;">Remove Users</h2>
+        <h2 class="text-center pt-4" style="color : #6c757d;">Account Index</h2>
         <br>
             <div class="row">
                 <div class="col">
@@ -62,7 +62,8 @@
                         <td>
                         <a href="userDetails.php?id=<?php echo $rows['id'] ;?>">
                          <button type="button" class="btn btn-primary" style="border-radius:0%;">View</button></a>
-                        <a href="removeuserrq.php?id=<?php echo $rows['id'] ;?>">
+                        <a  title="Click to do something"
+                            onclick="return  confirm('Are you sure you want to delete this user?');" href="removeuserrq.php?id=<?php echo $rows['id'] ;?>">
                          <button type="button" class="btn btn-danger" style="border-radius:0%;">Remove</button></a>
                         
                         </td> 

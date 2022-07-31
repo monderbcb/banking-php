@@ -101,7 +101,7 @@
               <input class="app-form-control" placeholder="EMAIL" type="email" name="email" required>
             </div>
             <div class="app-form-group">
-              <input class="app-form-control" placeholder="Over Draw" value="<?php echo $row['overDraw'] ?>" type="number" name="overDraw">
+              <input class="app-form-control" placeholder="Over Draw"  type="number" name="overDraw">
             </div>
             <div class="app-form-group">
               <select name="gender" class="app-form-control" type="text" required>

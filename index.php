@@ -37,7 +37,8 @@
                   <div class="col-md act">
                     <img src="img/ruser.jpg" class="img-fluid">
                     <br>
-                    <a href="accountIndex.php"><button style="background-color : #2785C4;" style="border-radius:0%"> Accounts Index</button></a>
+                    <a href="accountIndex.php">
+                      <button style="background-color : #2785C4;" style="border-radius:0%"> Accounts Index</button></a>
                   </div>
                   <div class="col-md act">
                     <img src="img/transfer.jpg" class="img-fluid">

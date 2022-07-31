@@ -10,10 +10,10 @@ if ($conn->connect_error) {
 
 
   // sql to delete a record
-$sql = "UPDATE users set status=9 where id=$to";
+$sql = "UPDATE users set status=9 where id=$id";
 
 if ($conn->query($sql) === TRUE) {
-    header('Location: removeuser.php');
+    header('Location: accountIndex.php');
 } else {
   echo "Error deleting record: " . $conn->error;
 }
